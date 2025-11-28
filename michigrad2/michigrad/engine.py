@@ -54,19 +54,21 @@ class Value:
         return out
     
     def tanh(self):
-        out = Value(math.tanh(self.data)(self,),"tanh")
+
+        out = Value(math.tanh(self.data),(self,),"tanh")
 
         def _backward():
-            self.grad += 1-math.tanh(out.data)**2
+            self.grad += (1 - out.data**2) * out.grad
         out._backward = _backward
 
         return out
     
     def sigmoid(self):
-        out = Value(1/1+math.e**(-self.data)(self,),"sig")
+        sig = 1 / (1 + math.exp(-self.data))
+        out = Value(sig,(self,),"sig")
 
         def _backward():
-            self.grad += (math.e**out.data)/((1+math.e**-out.data)**2)
+            self.grad += out.data * (1 - out.data) * out.grad
         out._backward = _backward
 
         return out

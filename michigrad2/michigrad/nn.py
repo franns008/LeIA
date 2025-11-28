@@ -98,9 +98,10 @@ class Layer(Module):
 class MLP(Module):
 
     def __init__(self, nin, nouts):
-        sz = [[nin]] + nouts
-        # [1, (2, "ReLU"), (2, "Sigmoid"), (1)]
-        print(sz[1][0])
+
+        sz = [ (nin, ) ] + nouts
+
+        print(sz)
         self.layers = [
             Layer(
                 sz[i][0],
