@@ -101,12 +101,12 @@ class MLP(Module):
 
         sz = [ (nin, ) ] + nouts
 
-        print(sz)
+       
         self.layers = [
             Layer(
-                sz[i][0],
-                sz[i + 1][0],
-                sz[i + 1][1] if len(sz[i + 1]) == 2 else "Linear",
+                sz[i][0], #Representa el numero de entradas
+                sz[i + 1][0], #Representa el numero de salidas
+                sz[i + 1][1] if len(sz[i + 1]) == 2 else "Linear", #Representa la funcion de activacion
             )
             for i in range(len(nouts))
         ]
