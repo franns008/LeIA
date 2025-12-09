@@ -19,70 +19,20 @@ class Neuron(Module):
         self.w = [Value(random.uniform(-1, 1)) for _ in range(nin)]
         self.b = Value(0)
 
-    @abstractmethod
     def __call__(self, x):
-        pass
+        act = sum((wi*xi for wi,xi in zip(self.w, x)), self.b)
+        return act
 
     def parameters(self):
         return self.w + [self.b]
 
-    @abstractmethod
     def __repr__(self):
-        pass
-
-
-class TanhNeuron(Neuron):
-
-    def __call__(self, x):
-        act = sum((wi * xi for wi, xi in zip(self.w, x)), self.b)
-        return act.tanh()
-
-    def __repr__(self):
-        return f"{'Tanh '}Neuron({len(self.w)})"
-
-
-class SigmoidNeuron(Neuron):
-
-    def __call__(self, x):
-        act = sum((wi * xi for wi, xi in zip(self.w, x)), self.b)
-        return act.sigmoid()
-
-    def __repr__(self):
-        return f"{'Sigmoid '}Neuron({len(self.w)})"
-
-
-class ReLUNeuron(Neuron):
-
-    def __call__(self, x):
-        act = sum((wi * xi for wi, xi in zip(self.w, x)), self.b)
-        return act.relu()
-
-    def __repr__(self):
-        return f"{'ReLU '}Neuron({len(self.w)})"
-
-
-class LinearNeuron(Neuron):
-
-    def __call__(self, x):
-        act = sum((wi * xi for wi, xi in zip(self.w, x)), self.b)
-        return act
-
-    def __repr__(self):
-        return f"{'Linear '}Neuron({len(self.w)})"
-
+        return f"{'Linear'}Neuron({len(self.w)})"
 
 class Layer(Module):
 
-    def __init__(self, nin, nout, function="Linear", **kwargs):
-        match function:
-            case "Linear":
-                self.neurons = [LinearNeuron(nin, **kwargs) for _ in range(nout)]
-            case "ReLU":
-                self.neurons = [ReLUNeuron(nin, **kwargs) for _ in range(nout)]
-            case "Sigmoid":
-                self.neurons = [SigmoidNeuron(nin, **kwargs) for _ in range(nout)]
-            case "Tanh":
-                self.neurons = [TanhNeuron(nin, **kwargs) for _ in range(nout)]
+    def __init__(self, nin, nout, **kwargs):
+        self.neurons = [Neuron(nin, **kwargs) for _ in range(nout)]
 
     def __call__(self, x):
         out = [n(x) for n in self.neurons]
@@ -95,21 +45,35 @@ class Layer(Module):
         return f"Layer of [{', '.join(str(n) for n in self.neurons)}]"
 
 
+class TanH(Module): 
+
+    def __call__(self, x):
+        return [xi.tanh() for xi in x]
+    
+    def __repr__(self):
+        return "Tanh Activation"
+
+class Sigmoid(Module):
+
+    def __call__(self, x):
+        return [xi.sigmoid() for xi in x]
+    
+    def __repr__(self):
+        return "Sigmoid Activation"
+    
+class ReLU(Module):
+
+    def __call__(self, x):
+        return [xi.relu() for xi in x]
+    
+    def __repr__(self):
+        return "Sigmoid Activation"
+
 class MLP(Module):
 
-    def __init__(self, nin, nouts):
 
-        sz = [ (nin, ) ] + nouts
-
-       
-        self.layers = [
-            Layer(
-                sz[i][0], #Representa el numero de entradas
-                sz[i + 1][0], #Representa el numero de salidas
-                sz[i + 1][1] if len(sz[i + 1]) == 2 else "Linear", #Representa la funcion de activacion
-            )
-            for i in range(len(nouts))
-        ]
+    def __init__(self, layers):
+        self.layers = layers
 
     def __call__(self, x):
         for layer in self.layers:
